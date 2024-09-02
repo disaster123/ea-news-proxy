@@ -2,10 +2,11 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import ssl
 import requests
 import socket
-import socket
 import time
 import sys
 import dns.resolver
+import datetime
+import os
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import serialization, hashes
@@ -175,9 +176,9 @@ def create_self_signed_cert(cert_file: str, key_file: str):
     ).serial_number(
         x509.random_serial_number()
     ).not_valid_before(
-        x509.datetime.datetime.utcnow()
+        datetime.datetime.utcnow()
     ).not_valid_after(
-        x509.datetime.datetime.utcnow() + x509.datetime.timedelta(days=365)
+        datetime.datetime.utcnow() + datetime.timedelta(days=365)
     ).sign(key, hashes.SHA256())
 
     # Write the private key to a file
