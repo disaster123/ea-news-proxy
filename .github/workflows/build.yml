@@ -28,11 +28,17 @@ jobs:
     - name: Build executable with PyInstaller
       run: pyinstaller --onefile news-proxy.py
 
+    - name: Install pandoc
+      run: choco install pandoc -y # Chocolatey installs pandoc on Windows runner
+
+    - name: Convert README.md to README.txt
+      run: pandoc README.md -o README.txt
+
     - name: Prepare release artifacts
       run: |
         mkdir release
         copy dist\news-proxy.exe release\news-proxy.exe
-        copy README.md release\README.md
+        copy README.txt release\README.txt
         copy start-in-loop.bat release\start-in-loop.bat
         cd release
         powershell Compress-Archive -Path * -DestinationPath ../news-proxy-release.zip
