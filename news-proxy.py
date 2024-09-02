@@ -6,7 +6,15 @@ import socket
 import time
 import sys
 import dns.resolver
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization as crypto_serialization
 
+# File paths for the certificate and key
+CERT_FILE = 'server.cert'
+KEY_FILE = 'private.key'
 cache = {}
 dns_cache = {}
 hostname = "ec.forexprostools.com"
@@ -142,13 +150,73 @@ class MyHTTPServer(HTTPServer):
         # Set the listen backlog
         self.socket.listen(25)
 
+def create_self_signed_cert(cert_file: str, key_file: str):
+    # Generate a private key
+    key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+    )
+
+    # Generate a self-signed certificate
+    subject = issuer = x509.Name([
+        x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"California"),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, u"San Francisco"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"Fake Company"),
+        x509.NameAttribute(NameOID.COMMON_NAME, u"news-proxy.fake"),
+    ])
+
+    cert = x509.CertificateBuilder().subject_name(
+        subject
+    ).issuer_name(
+        issuer
+    ).public_key(
+        key.public_key()
+    ).serial_number(
+        x509.random_serial_number()
+    ).not_valid_before(
+        x509.datetime.datetime.utcnow()
+    ).not_valid_after(
+        x509.datetime.datetime.utcnow() + x509.datetime.timedelta(days=365)
+    ).sign(key, hashes.SHA256())
+
+    # Write the private key to a file
+    with open(key_file, "wb") as f:
+        f.write(
+            key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            )
+        )
+
+    # Write the certificate to a file
+    with open(cert_file, "wb") as f:
+        f.write(
+            cert.public_bytes(
+                encoding=serialization.Encoding.PEM
+            )
+        )
+
+    print(f"Created self-signed certificate and private key: {cert_file}, {key_file}")
+
+def ensure_certificates():
+    if not os.path.exists(CERT_FILE) or not os.path.exists(KEY_FILE):
+        create_self_signed_cert(CERT_FILE, KEY_FILE)
+    else:
+        print(f"Certificate and key already exist: {CERT_FILE}, {KEY_FILE}")
+
+
 sys.stdout = Unbuffered(sys.stdout)
+
+
+ensure_certificates()
 
 httpd = MyHTTPServer(('localhost', 443), SimpleHTTPRequestHandler)
 
 httpd.socket = ssl.wrap_socket (httpd.socket,
-        keyfile="private.key",
-        certfile='server.cert', server_side=True)
+        keyfile=KEY_FILE,
+        certfile=CERT_FILE, server_side=True)
 
 # install override DNS
 socket.getaddrinfo = new_getaddrinfo
