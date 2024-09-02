@@ -215,9 +215,12 @@ ensure_certificates()
 
 httpd = MyHTTPServer(('localhost', 443), SimpleHTTPRequestHandler)
 
-httpd.socket = ssl.wrap_socket (httpd.socket,
-        keyfile=KEY_FILE,
-        certfile=CERT_FILE, server_side=True)
+# Create an SSL context
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+ssl_context.load_cert_chain(certfile=CERT_FILE, keyfile=KEY_FILE)
+
+# Wrap the server's socket with SSL
+httpd.socket = ssl_context.wrap_socket(httpd.socket, server_side=True)
 
 # install override DNS
 socket.getaddrinfo = new_getaddrinfo
