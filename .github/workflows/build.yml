@@ -33,6 +33,7 @@ jobs:
         mkdir release
         copy dist\news-proxy.exe release\news-proxy.exe
         copy README.md release\README.md
+        copy start-in-loop.bat release\start-in-loop.bat
         cd release
         powershell Compress-Archive -Path * -DestinationPath ../news-proxy-release.zip
         cd ..
