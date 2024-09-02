@@ -36,7 +36,10 @@ jobs:
 
     - name: Add note to README.txt
       run: |
-        echo "Note: For the most readable version of these instructions, please view the Markdown version of this file directly on GitHub at https://github.com/disaster123/ea-news-proxy/blob/main/README.md." > README.txt
+        echo "Note: For the most readable version of these instructions, please view the Markdown version of this file" > README.txt
+        echo "directly on GitHub at https://github.com/disaster123/ea-news-proxy/blob/main/README.md." >> README.txt
+        echo "" >> README.txt
+        echo "" >> README.txt
         type README2.txt >> README.txt
       shell: pwsh
 
