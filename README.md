@@ -1,3 +1,5 @@
+**Note:** For the most readable version of these instructions, please view the Markdown version of this file directly on GitHub at [https://github.com/disaster123/ea-news-proxy/blob/main/README.md](https://github.com/disaster123/ea-news-proxy/blob/main/README.md).
+
 # News Proxy
 
 This project provides a news proxy service that intercepts and manages requests to the `ec.forexprostools.com` domain. It uses a self-signed SSL certificate for secure communication and supports **ONLY** Investing.com.
@@ -10,17 +12,25 @@ This project provides a news proxy service that intercepts and manages requests 
 
 1. **Download the Release Archive:**
 
-   Visit the [Releases page](https://github.com/disaster123/ea-news-proxy/releases) on GitHub and download the latest release archive (`news-proxy-release.zip`). This file contains the executable, `README.md`, and the startup batch script.
+   Visit the [Releases page](https://github.com/disaster123/ea-news-proxy/releases) on GitHub and download the latest release archive (`news-proxy-release.zip`). This file contains the executable, `README.txt`, and the startup batch script.
 
 2. **Extract the Archive:**
 
-   After downloading the `news-proxy-release.zip`, extract the contents to a new directory. This will create a folder with `news-proxy.exe`, `README.md`, and `start-in-loop.bat`.
+   After downloading the `news-proxy-release.zip`, extract the contents to a new directory. This will create a folder with `news-proxy.exe`, `README.txt`, and `start-in-loop.bat`.
 
    - On Windows, you can usually right-click the `.zip` file and select "Extract All..." or use a tool like [7-Zip](https://www.7-zip.org/).
 
-3. **Run the Executable:**
+3. **Read the README.txt:**
+
+   Inside the extracted folder, open the `README.txt` file for easy-to-read instructions on using the proxy. For a better reading experience, you might prefer viewing the Markdown version of this file directly on GitHub [here](https://github.com/disaster123/ea-news-proxy/blob/main/README.md).
+
+4. **Run the Executable:**
 
    Navigate to the directory where you extracted the files and run the `news-proxy.exe` by double-clicking on it. On the first run, the server will automatically generate the required SSL certificates (`server.cert` and `private.key`) if they do not already exist. The server will start on port 443 with HTTPS enabled by default.
+
+5. **Windows SmartScreen Warning:**
+
+   On the first start of the `.bat` or `.exe`, Windows SmartScreen might show a warning. This happens because the file was downloaded from the internet. To proceed, click on "More info" and then "Run anyway" to allow the program to execute.
 
 ## Setup via Hosts File on Windows
 
