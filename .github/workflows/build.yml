@@ -3,8 +3,8 @@ name: Build and Release Executable
 on:
   push:
     branches:
-      - main  # oder der Branch, den du überwachen möchtest
-  workflow_dispatch: # ermöglicht manuelles Triggern
+      - main  # or the branch you want to monitor
+  workflow_dispatch: # allows manual triggering
 
 jobs:
   build:
@@ -23,16 +23,25 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller
-        pip install -r requirements.txt  # Installiere Abhängigkeiten aus deiner requirements.txt
+        pip install -r requirements.txt  # Install dependencies from requirements.txt
 
     - name: Build executable with PyInstaller
       run: pyinstaller --onefile news-proxy.py
 
+    - name: Prepare release artifacts
+      run: |
+        mkdir release
+        copy dist\news-proxy.exe release\news-proxy.exe
+        copy README.md release\README.md
+        cd release
+        powershell Compress-Archive -Path * -DestinationPath ../news-proxy-release.zip
+        cd ..
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: executable
-        path: dist/news-proxy.exe
+        name: release-archive
+        path: news-proxy-release.zip
 
   release:
     needs: build
@@ -44,29 +53,28 @@ jobs:
     - name: Download build artifact
       uses: actions/download-artifact@v4
       with:
-        name: executable
+        name: release-archive
 
     - name: List downloaded files
-      run: ls -R  # Listet alle heruntergeladenen Dateien und Verzeichnisse auf, um die Datei zu lokalisieren.
+      run: ls -R  # Lists all downloaded files and directories to locate the file
 
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ github.run_number }}
         release_name: Release v${{ github.run_number }}
         draft: false
         prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./news-proxy.exe
-        asset_name: news-proxy.exe
-        asset_content_type: application/octet-stream
-
+        asset_path: ./news-proxy-release.zip
+        asset_name: news-proxy-release.zip
+        asset_content_type: application/zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
