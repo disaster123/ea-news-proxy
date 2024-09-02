@@ -46,6 +46,9 @@ jobs:
       with:
         name: executable
 
+    - name: List downloaded files
+      run: ls -R  # Listet alle heruntergeladenen Dateien und Verzeichnisse auf, um die Datei zu lokalisieren.
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
