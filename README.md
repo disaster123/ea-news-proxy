@@ -1,5 +1,3 @@
-**Note:** For the most readable version of these instructions, please view the Markdown version of this file directly on GitHub at [https://github.com/disaster123/ea-news-proxy/blob/main/README.md](https://github.com/disaster123/ea-news-proxy/blob/main/README.md).
-
 # News Proxy
 
 This project provides a news proxy service that intercepts and manages requests to the `ec.forexprostools.com` domain. It uses a self-signed SSL certificate for secure communication and supports **ONLY** Investing.com.

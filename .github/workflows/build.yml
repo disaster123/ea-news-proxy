@@ -31,8 +31,14 @@ jobs:
     - name: Install pandoc
       run: choco install pandoc -y # Chocolatey installs pandoc on Windows runner
 
-    - name: Convert README.md to README.txt
-      run: pandoc README.md -o README.txt
+    - name: Convert README.md to README2.txt
+      run: pandoc README.md -o README2.txt
+
+    - name: Add note to README.txt
+      run: |
+        echo "Note: For the most readable version of these instructions, please view the Markdown version of this file directly on GitHub at https://github.com/disaster123/ea-news-proxy/blob/main/README.md." > README.txt
+        type README2.txt >> README.txt
+      shell: pwsh
 
     - name: Prepare release artifacts
       run: |
