@@ -78,8 +78,8 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       with:
-        tag_name: v${{ github.run_number }}
-        release_name: Release v${{ github.run_number }}
+        tag_name: ${{ github.ref_name }}  # Use the tag that triggered the workflow
+        release_name: Release ${{ github.ref_name }}  # Name the release with the tag
         draft: false
         prerelease: false
       env:
