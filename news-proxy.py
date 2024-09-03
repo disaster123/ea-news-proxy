@@ -13,12 +13,11 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization as crypto_serialization
 
-# File paths for the certificate and key
 CERT_FILE = 'server.cert'
 KEY_FILE = 'private.key'
+hostname = "ec.forexprostools.com"
 cache = {}
 dns_cache = {}
-hostname = "ec.forexprostools.com"
 
 class Unbuffered(object):
    def __init__(self, stream):
@@ -33,30 +32,28 @@ class Unbuffered(object):
        return getattr(self.stream, attr)
 
 def update_real_ip(hostname):
-    ip_address = get_ip_from_hostname(hostname, '8.8.8.8')
+    ip_address = get_ip_from_hostname(hostname, ['8.8.8.8', '8.8.4.4'])
     
     print(f"Hostname: {hostname} points to: {ip_address}")
     
     override_dns(hostname, ip_address)
 
-def get_ip_from_hostname(hostname, dns_server):
+def get_ip_from_hostname(hostname, dns_servers):
     resolver = dns.resolver.Resolver()
-    resolver.nameservers = [dns_server]
+    resolver.nameservers = dns_servers
     
     try:
-        # DNS-Abfrage für A-Record (IPv4)
         answer = resolver.resolve(hostname, 'A')
-        
-        # Die erste gefundene IP-Adresse zurückgeben
         return str(answer[0])
+
     except dns.resolver.NXDOMAIN:
-        return "Der Hostname konnte nicht aufgelöst werden (NXDOMAIN)."
+        return "The hostname could not be resolved (NXDOMAIN)."
     except dns.resolver.Timeout:
-        return "Die DNS-Abfrage hat den Timeout überschritten."
+        return "The DNS query timed out."
     except dns.resolver.NoNameservers:
-        return "Kein Nameserver konnte erreicht werden."
+        return "No nameservers could be reached."
     except dns.resolver.NoAnswer:
-        return "Die DNS-Abfrage lieferte keine Antwort."
+        return "The DNS query returned no answer."
 
 # Capture a dict of hostname and their IPs to override with
 def override_dns(domain, ip):
@@ -87,9 +84,9 @@ def fetch_webpage(url):
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
         'Upgrade-Insecure-Requests': '1',
-        'Referer': 'https://www.google.com/',  # Setzt den Referer, um einen normalen Seitenfluss zu simulieren
+        'Referer': 'https://www.google.com/',
         'Cache-Control': 'max-age=0',
-        'DNT': '1',  # Do Not Track Header
+        'DNT': '1',
     }
      
     try:
@@ -99,7 +96,6 @@ def fetch_webpage(url):
         
         return status_code, content
     except requests.RequestException as e:
-        # Fehlerbehandlung bei Netzwerkproblemen oder HTTP-Fehlern
         return None, str(e)
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -114,6 +110,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         in_cache = False
         in_timeout = False
         if cache.get(requested_url, {}).get('content', '') != '':
+            # 5 hour timeout
             if (cache.get(requested_url, {}).get('time', 0) + (5*60*60)) < time.time():
                 in_timeout = True
 
@@ -207,23 +204,26 @@ def ensure_certificates():
     else:
         print(f"Certificate and key already exist: {CERT_FILE}, {KEY_FILE}")
 
+def run():
+    # unbuffer all output
+    sys.stdout = Unbuffered(sys.stdout)
+    
+    # verify certs exist
+    ensure_certificates()
+    
+    # create webserver
+    httpd = MyHTTPServer(('localhost', 443), SimpleHTTPRequestHandler)
+    
+    # Create an SSL context
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_context.load_cert_chain(certfile=CERT_FILE, keyfile=KEY_FILE)
+    httpd.socket = ssl_context.wrap_socket(httpd.socket, server_side=True)
+    
+    # install override DNS
+    socket.getaddrinfo = new_getaddrinfo
+    
+    httpd.serve_forever()
 
-sys.stdout = Unbuffered(sys.stdout)
-
-
-ensure_certificates()
-
-httpd = MyHTTPServer(('localhost', 443), SimpleHTTPRequestHandler)
-
-# Create an SSL context
-ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-ssl_context.load_cert_chain(certfile=CERT_FILE, keyfile=KEY_FILE)
-
-# Wrap the server's socket with SSL
-httpd.socket = ssl_context.wrap_socket(httpd.socket, server_side=True)
-
-# install override DNS
-socket.getaddrinfo = new_getaddrinfo
-
-httpd.serve_forever()
+if __name__ == "__main__":
+    run()
 
