@@ -90,7 +90,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./news-proxy-release.zip
-        asset_name: news-proxy-release.zip
+        asset_name: news-proxy-${{ github.ref_name }}.zip
         asset_content_type: application/zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
