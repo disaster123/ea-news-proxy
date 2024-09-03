@@ -2,9 +2,9 @@ name: Build and Release Executable
 
 on:
   push:
-    branches:
-      - main  # or the branch you want to monitor
-  workflow_dispatch: # allows manual triggering
+    tags:
+      - 'v[0-9]+.*'
+  workflow_dispatch: # ermöglicht manuelles Triggern
 
 jobs:
   build:
