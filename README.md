@@ -1,6 +1,6 @@
 # News Proxy
 
-This project provides a news proxy service that intercepts and manages requests to the `ec.forexprostools.com` domain. It uses a self-signed SSL certificate for secure communication and supports **ONLY** Investing.com.
+This project provides a news proxy service that intercepts and manages requests to `ec.forexprostools.com` and `nfs.faireconomy.media` domain. It uses a self-signed SSL certificate for secure communication.
 
 ## Disclaimer
 
@@ -32,7 +32,7 @@ This project provides a news proxy service that intercepts and manages requests 
 
 ## Setup via Hosts File on Windows
 
-To redirect requests from `ec.forexprostools.com` to your local proxy server, modify the hosts file on your Windows machine:
+To redirect requests from `ec.forexprostools.com` and `nfs.faireconomy.media` to your local proxy server, modify the hosts file on your Windows machine:
 
 1. **Open Notepad as Administrator:**
 
@@ -52,13 +52,14 @@ To redirect requests from `ec.forexprostools.com` to your local proxy server, mo
 
    ```
    127.0.0.1 ec.forexprostools.com
+   127.0.0.1 nfs.faireconomy.media
    ```
 
 4. **Save the File:**
 
    Save the changes and close Notepad.
 
-This configuration ensures that requests to `ec.forexprostools.com` are redirected to your local proxy server.
+This configuration ensures that requests to `ec.forexprostools.com` and `nfs.faireconomy.media` are redirected to your local proxy server.
 
 ## Add to Windows Autostart
 
@@ -80,8 +81,3 @@ To automatically start the proxy when your computer boots, create a shortcut to 
 
 - **Auto-detection of News Timezones:** Investing.com provides the added advantage of automatically detecting the correct timezones for news events, making it easier to keep track of economic news in your local time.
 
-## Caveats
-
-- **Inaccessible via Browser:** The site `ec.forexprostools.com` will no longer be accessible directly via your browser. All traffic to this site will be routed through the proxy server.
-
-- **Limited Support:** The proxy supports **ONLY** Investing.com. Other data sources or functionalities may not work correctly.
