@@ -15,7 +15,6 @@ from cryptography.hazmat.primitives import serialization as crypto_serialization
 
 CERT_FILE = 'server.cert'
 KEY_FILE = 'private.key'
-hostname = "ec.forexprostools.com"
 cache = {}
 dns_cache = {}
 
@@ -102,10 +101,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         global cache
-        global hostname
         code = 403
         text = "no data"
         requested_url = self.path
+        requested_host = self.headers.get('Host')
 
         in_cache = False
         in_timeout = False
@@ -117,24 +116,24 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             in_cache = True
 
         if not in_cache or in_timeout:
-            print(f"Refresh Cache: {requested_url}")
-            update_real_ip(hostname)
-            code, text = fetch_webpage("https://" + hostname + requested_url)
+            print(f"Refresh Cache: {requested_host}{requested_url}")
+            update_real_ip(requested_host)
+            code, text = fetch_webpage("https://" + requested_host + requested_url)
 
             if code == 200:
-                print(f"Update Cache: {requested_url}")
+                print(f"Update Cache: {requested_host}{requested_url}")
                 cache.update( { requested_url: { 'content': text, 'time': time.time() } } )
             else:
                 # do nothing - we just keep the old content in cache - so it can still be served below
                 print(f"ERROR: Updating Cache: use old stale cache Code: {code}")
 
         if cache.get(requested_url, {}).get('content', '') != '':
-            print(f"Use Cache: {requested_url}")
+            print(f"Use Cache: {requested_host}{requested_url}")
             text = cache.get(requested_url, {}).get('content', '')
             code = 200
         else:
             # keep original status code
-            print(f"No Cache found: {requested_url}")
+            print(f"No Cache found: {requested_host}{requested_url}")
 
         self.send_response(code)
         self.end_headers()
