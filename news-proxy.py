@@ -80,7 +80,7 @@ def fetch_webpage(url):
             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
         ),
         'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Encoding': 'identity',
         'Connection': 'keep-alive',
         'Upgrade-Insecure-Requests': '1',
         'Referer': 'https://www.google.com/',
