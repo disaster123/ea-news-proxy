@@ -126,6 +126,15 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             else:
                 # do nothing - we just keep the old content in cache - so it can still be served below
                 print(f"ERROR: Updating Cache: use old stale cache Code: {code}")
+                error_file_path = os.path.join(os.path.dirname(__file__), "error.html")
+
+                try:
+                    with open(error_file_path, "w") as error_file:
+                        error_file.write(text)  # Save the error text in error.html
+                    print(f"Error message saved to {error_file_path}")
+                except Exception as e:
+                    print(f"Failed to write to error.html: {e}")
+
 
         if cache.get(requested_url, {}).get('content', '') != '':
             print(f"Use Cache: {requested_host}{requested_url}")
