@@ -1,3 +1,7 @@
+# WARNING #
+
+Investing / Cloudflare has added more safeguards and this proxy is no longer working with Investing!!
+
 # News Proxy
 
 This project provides a news proxy service that intercepts and manages requests to `ec.forexprostools.com` and `nfs.faireconomy.media` domain. It uses a self-signed SSL certificate for secure communication.
