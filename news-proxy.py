@@ -92,10 +92,11 @@ def fetch_webpage(url):
         response = requests.get(url, headers=headers, timeout=5)
         status_code = response.status_code
         content = response.text
+        response_headers = response.headers
         
-        return status_code, content
+        return status_code, content, response_headers
     except requests.RequestException as e:
-        return None, str(e)
+        return None, str(e), None
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
@@ -118,7 +119,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         if not in_cache or in_timeout:
             print(f"Refresh Cache: {requested_host}{requested_url}")
             update_real_ip(requested_host)
-            code, text = fetch_webpage("https://" + requested_host + requested_url)
+            code, text, headers = fetch_webpage("https://" + requested_host + requested_url)
 
             if code == 200:
                 print(f"Update Cache: {requested_host}{requested_url}")
